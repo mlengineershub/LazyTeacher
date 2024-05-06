@@ -1,0 +1,122 @@
+body, html {
+    height: 100%; 
+    margin: 0; 
+    font-family: 'Roboto', sans-serif; 
+    background: #f4f4f9; 
+    color: #333;
+    display: flex;
+    flex-direction: column;
+}
+
+header #header-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+header h1 {
+    margin: 0;
+    padding: 0;
+    font-size: 32px;
+}
+
+.slogan {
+    font-size: 14px;
+    color: #DDD;
+    margin-top: 5px;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+footer p {
+    margin: 0;
+    padding-right: 20px;
+    color: white;
+    font-size: 16px;
+}
+
+header {
+    background-color: #4a148c; 
+    color: white; 
+    text-align: center;
+    padding: 20px 0;
+    font-size: 32px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+header, footer {
+    flex-shrink: 0; 
+    background-color: #4a148c; 
+    color: white;
+    text-align: center;
+    padding: 10px 0; 
+    font-size: 24px; 
+}
+
+footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; 
+    padding-left: 20px; 
+}
+
+
+footer img {
+    height: 30px; 
+}
+
+header #logo {
+    height: 50px;
+    margin-right: 10px;
+}
+
+
+main {
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: auto; 
+}
+
+.upload-area {
+    width: 300px;
+    height: 400px;
+    border-radius: 10px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: dashed 2px #4a148c; 
+    cursor: pointer; 
+    position: relative; 
+}
+
+.upload-icon {
+    font-size: 48px;
+    color: #4a148c;
+}
+
+.upload-area p {
+    font-size: 18px;
+    color: #4a148c;
+}
+
+#results {
+    width: 80%;
+    margin-top: 30px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LazyTeacher</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div id="header-content">
+            <img src="images/totoro.gif" alt="Totoro" id="logo">
+            <div>
+                <h1>LazyTeacher</h1>
+                <p class="slogan">Get your papers graded</p>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="upload-area" onclick="document.getElementById('fileInput').click();">
+            <input type="file" id="fileInput" hidden>
+            <div class="upload-icon">+</div>
+            <p>Upload your copy</p>
+        </div>
+        <div id="results"></div>
+    </main>
+    <footer>
+        <div class="footer-content">
+            <a href="https://github.com/mlengineershub" target="_blank">
+                <img src="images/git_logo2.gif" alt="GitHub Logo">
+            </a>
+            <div class="creator-names">
+                <p>Ilan ALIOUCHOUCHE</p>
+                <p>Ilyes DJERFAF</p>
+            </div>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
