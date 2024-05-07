@@ -157,6 +157,7 @@ def lazy_teacher_pipeline(text: Union[str, List[str]],
     
     model.to(device)
     inputs = tokenizer(text, padding=True, truncation=True, return_tensors="pt").to(device)
+    model.eval()
     with torch.inference_mode():
         logits = model(**inputs).logits
 
