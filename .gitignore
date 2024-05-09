@@ -1,6 +1,15 @@
 train_cleaned*.csv
 undersampled_2_3_4_classes.csv
 **/checkpoint*/
-gte*
 resources/
 __pycache__/
+config.json
+*.safetensors
+*.pt
+*.pth
+trainer_state.json
+training_args.bin
+special_tokens_map.json
+tokenize*.json
+vocab.txt
+.DS_Store
