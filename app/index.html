@@ -19,10 +19,11 @@
     </header>
     <main>
         <div class="upload-area" onclick="document.getElementById('fileInput').click();">
-            <input type="file" id="fileInput" hidden>
+            <input type="file" id="fileInput" accept="image/*" hidden>
             <div class="upload-icon">+</div>
             <p>Upload your copy</p>
         </div>
+        <button id="uploadBtn">Upload Image</button>
         <div id="results"></div>
     </main>
     <footer>
