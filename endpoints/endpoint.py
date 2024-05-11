@@ -7,11 +7,18 @@ import pytesseract
 from PIL import Image
 import uvicorn
 
+import torch
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
+
 import os
 from dotenv import load_dotenv
 
+from utils import lazy_teacher_pipeline, load_glove_model
+
 # for windows users
-pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+pytesseract.pytesseract.tesseract_cmd = (
+    'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+)
 
 # Load environment variables
 ENV_FILE_PATH = (
@@ -22,6 +29,7 @@ load_dotenv(dotenv_path=ENV_FILE_PATH)
 host = os.getenv("HOST")
 port = int(os.getenv("PORT_ENDPOINT"))
 app_port = int(os.getenv("PORT_APP"))
+model_ckpt = os.getenv("MODEL_CKPT")
 
 # Initialize the FastAPI app
 app = FastAPI()
@@ -36,6 +44,18 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+device = 'cpu'
+if torch.cuda.is_available():
+    device = 'cuda'
+elif torch.backends.mps.is_available():
+    device = 'mps'
+model = AutoModelForSequenceClassification.from_pretrained(
+    model_ckpt, trust_remote_code=True
+).to(device)
+tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
+
+glove_model = load_glove_model()
+
 
 # Define the endpoints
 @app.get("/")
@@ -49,7 +69,13 @@ async def create_upload_file(image: UploadFile = File(...)):
     image_data = await image.read()
     image_pil = Image.open(io.BytesIO(image_data))
     text = pytesseract.image_to_string(image_pil)
-    return JSONResponse(content={"text": text})
+    note = lazy_teacher_pipeline(text=text,
+                                 model=model,
+                                 tokenizer=tokenizer,
+                                 glove_model=glove_model,
+                                 device=device)
+    return JSONResponse(content={"text": text,
+                                 "note": note})
     return {"message": "Fichier reçu"}
 
 

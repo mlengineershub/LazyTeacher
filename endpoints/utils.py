@@ -50,8 +50,9 @@ def load_glove_model() -> Union[Dict[str, float], KeyedVectors]:
     except Exception:
         print("GloVe model not found locally, downloading it...")
         glove_model = downloader.load("glove-wiki-gigaword-300")
-        
+
     return glove_model
+
 
 def simple_cleaning(text: str) -> str:
     """
@@ -69,8 +70,8 @@ def simple_cleaning(text: str) -> str:
     text = strip_short(text)
 
     text = text.lower()
-    
-    return text            
+
+    return text
 
 
 def vocabulary_coverage(words: List[str],
@@ -94,12 +95,14 @@ def correct_text_on_the_fly(words: List[str],
                             glove_model: Union[Dict[str, float], KeyedVectors],
                             ratio_threshold: float = 0.7) -> Dict[str, str]:
     """
-    Corrects text on the fly using the Levenshtein ratio to find the closest words in the GloVe model
+    Corrects text on the fly using the Levenshtein ratio
+    to find the closest words in the GloVe model
 
     Args:
         words: List of words to correct
         glove_model: The GloVe model used for correction
-        ratio_threshold: Threshold for accepting a correction based on the Levenshtein ratio
+        ratio_threshold: Threshold for accepting a correction
+            based on the Levenshtein ratio
     Returns:
         Dictionary mapping initial words to their corrected form
     """
@@ -145,16 +148,18 @@ def lazy_teacher_pipeline(text: Union[str, List[str]],
     text = [simple_cleaning(text) for text in text]
     tokenized_texts = [word_tokenize(text) for text in text]
     words_not_in_glove = vocabulary_coverage(tokenized_texts, glove_model)
-    
+
     if on_the_fly:
-        corrected_words = correct_text_on_the_fly(words_not_in_glove, glove_model)
-        corrected_texts = [[corrected_words.get(word, word) for word in tokenized_text] for tokenized_text in tokenized_texts]
+        corrected_words = correct_text_on_the_fly(words_not_in_glove,
+                                                  glove_model)
+        corrected_texts = [[corrected_words.get(word, word)
+                            for word in tokenized_text] for tokenized_text in tokenized_texts]
     else:
         corrected_words = {word: CORRECTED_DICT.get(word, word) for word in words_not_in_glove}
         corrected_texts = [[corrected_words.get(word, word) for word in tokenized_text] for tokenized_text in tokenized_texts]
-    
+
     text = [" ".join(tokenized_text) for tokenized_text in corrected_texts]
-    
+
     model.to(device)
     inputs = tokenizer(text, padding=True, truncation=True, return_tensors="pt").to(device)
     model.eval()
