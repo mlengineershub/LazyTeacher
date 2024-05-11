@@ -53,8 +53,7 @@ model = AutoModelForSequenceClassification.from_pretrained(
     model_ckpt, trust_remote_code=True
 ).to(device)
 tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
-
-glove_model = load_glove_model()
+glove_vocab = load_glove_model()
 
 
 # Define the endpoints
@@ -72,10 +71,10 @@ async def create_upload_file(image: UploadFile = File(...)):
     note = lazy_teacher_pipeline(text=text,
                                  model=model,
                                  tokenizer=tokenizer,
-                                 glove_model=glove_model,
+                                 glove_vocab=glove_vocab,
                                  device=device)
     return JSONResponse(content={"text": text,
-                                 "note": note})
+                                 "note": note[0]})
     return {"message": "Fichier reçu"}
 
 

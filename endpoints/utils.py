@@ -1,7 +1,7 @@
 import os
 import json
 from dotenv import load_dotenv
-from typing import Union, List, Dict
+from typing import Optional, Union, List, Dict, Any
 
 # PyTorch
 import torch
@@ -31,12 +31,14 @@ PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(dotenv_path=os.path.join(PROJECT_DIR, ".env"))
 
 # Load corrected dictionary from a JSON file
-CORRECTED_DICT = json.load(open(os.path.join(PROJECT_DIR, os.getenv("CORRECTED_DICT_PATH"))))
+_CORRECTED_DICT = os.path.join(os.getenv("DATA_PATH"), os.getenv("CORRECTED_DICT"))
+CORRECTED_DICT = json.load(open(os.path.join(PROJECT_DIR, _CORRECTED_DICT)))
 # Set the path to the GloVe model from environment variables
-GLOVE_PATH = os.path.join(PROJECT_DIR, os.getenv("GLOVE_PATH"))
+_GLOVE_PATH = os.path.join(os.getenv("RESOURCES_PATH"), os.getenv("GLOVE_PATH"))
+GLOVE_PATH = os.path.join(PROJECT_DIR, _GLOVE_PATH)
 
 
-def load_glove_model() -> Union[Dict[str, float], KeyedVectors]:
+def load_glove_model() -> List[Any]:
     """
     Loads the GloVe model from a local file if available, otherwise downloads it
 
@@ -50,8 +52,9 @@ def load_glove_model() -> Union[Dict[str, float], KeyedVectors]:
     except Exception:
         print("GloVe model not found locally, downloading it...")
         glove_model = downloader.load("glove-wiki-gigaword-300")
-
-    return glove_model
+    finally:
+        print("GloVe model loaded successfully")
+        return glove_model.index_to_key
 
 
 def simple_cleaning(text: str) -> str:
@@ -75,24 +78,24 @@ def simple_cleaning(text: str) -> str:
 
 
 def vocabulary_coverage(words: List[str],
-                        glove_model: Union[Dict[str, float], KeyedVectors]) -> List[str]:
+                        glove_vocab: List[Any]) -> List[str]:
     """
     Computes the vocabulary coverage of words using the GloVe model
 
     Args:
         words: List of words to check for coverage
-        glove_model: The GloVe model used for checking word coverage
+        glove_vocab: The GloVe vocabulary used for checking word coverage
     Returns:
         List of out-of-vocabulary words
     """
 
-    oov_words = [word for word in words if word not in glove_model]
+    oov_words = [word for word in words if word not in glove_vocab]
 
     return oov_words
 
 
 def correct_text_on_the_fly(words: List[str],
-                            glove_model: Union[Dict[str, float], KeyedVectors],
+                            glove_vocab: List[Any],
                             ratio_threshold: float = 0.7) -> Dict[str, str]:
     """
     Corrects text on the fly using the Levenshtein ratio
@@ -100,18 +103,17 @@ def correct_text_on_the_fly(words: List[str],
 
     Args:
         words: List of words to correct
-        glove_model: The GloVe model used for correction
+        glove_vocab: The GloVe vocabulary used for correction
         ratio_threshold: Threshold for accepting a correction
             based on the Levenshtein ratio
     Returns:
         Dictionary mapping initial words to their corrected form
     """
 
-    glove_words = glove_model.index_to_key
     corrected_words = {word: word for word in words}
     for word in words:
         best_match, best_ratio = None, 0
-        for glove_word in glove_words:
+        for glove_word in glove_vocab:
             ratio = levenshtein_distance(word, glove_word)
             if ratio > best_ratio:
                 best_match, best_ratio = glove_word, ratio
@@ -124,7 +126,7 @@ def correct_text_on_the_fly(words: List[str],
 def lazy_teacher_pipeline(text: Union[str, List[str]],
                           model: AutoModelForSequenceClassification,
                           tokenizer: AutoTokenizer,
-                          glove_model: Union[Dict[str, float], KeyedVectors],
+                          glove_vocab: Optional[List[Any]],
                           on_the_fly: bool = False,
                           device: str = "cpu") -> List[int]:
     """
@@ -147,18 +149,25 @@ def lazy_teacher_pipeline(text: Union[str, List[str]],
 
     text = [simple_cleaning(text) for text in text]
     tokenized_texts = [word_tokenize(text) for text in text]
-    words_not_in_glove = vocabulary_coverage(tokenized_texts, glove_model)
-
+    words_not_in_glove = [vocabulary_coverage(tokenized_text, glove_vocab) for tokenized_text in tokenized_texts]
     if on_the_fly:
-        corrected_words = correct_text_on_the_fly(words_not_in_glove,
-                                                  glove_model)
-        corrected_texts = [[corrected_words.get(word, word)
-                            for word in tokenized_text] for tokenized_text in tokenized_texts]
+        corrected_words = [correct_text_on_the_fly(word_not_in_glove, glove_vocab) for word_not_in_glove in words_not_in_glove]
+        corrected_texts = [
+            [corrected_words[i].get(word, word) for word in tokenized_text]
+            for i, tokenized_text in enumerate(tokenized_texts)
+        ]
     else:
-        corrected_words = {word: CORRECTED_DICT.get(word, word) for word in words_not_in_glove}
-        corrected_texts = [[corrected_words.get(word, word) for word in tokenized_text] for tokenized_text in tokenized_texts]
+        corrected_words = [{
+            word: CORRECTED_DICT.get(word, word)
+            for word in word_not_in_glove
+        } for word_not_in_glove in words_not_in_glove]
 
-    text = [" ".join(tokenized_text) for tokenized_text in corrected_texts]
+        corrected_texts = [
+            [corrected_words[i].get(word, word) for word in tokenized_text]
+            for i, tokenized_text in enumerate(tokenized_texts)
+        ]
+
+    text = [" ".join(cleaned_text) for cleaned_text in corrected_texts]
 
     model.to(device)
     inputs = tokenizer(text, padding=True, truncation=True, return_tensors="pt").to(device)
