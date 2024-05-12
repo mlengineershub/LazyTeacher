@@ -10,9 +10,9 @@ import torch
 from gensim import downloader
 from gensim.models import KeyedVectors
 from gensim.parsing.preprocessing import (
-                        strip_multiple_whitespaces, 
-                        strip_numeric, 
-                        strip_punctuation, 
+                        strip_multiple_whitespaces,
+                        strip_numeric,
+                        strip_punctuation,
                         strip_short
                         )
 
@@ -31,24 +31,41 @@ PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(dotenv_path=os.path.join(PROJECT_DIR, ".env"))
 
 # Load corrected dictionary from a JSON file
-_CORRECTED_DICT = os.path.join(os.getenv("DATA_PATH"), os.getenv("CORRECTED_DICT"))
-CORRECTED_DICT = json.load(open(os.path.join(PROJECT_DIR, _CORRECTED_DICT)))
+CORRECTED_DICT_LOCAL_PATH = os.path.join(
+    os.getenv("DATA_PATH"),
+    os.getenv("CORRECTED_DICT")
+)
+CORRECTED_DICT = json.load(
+    open(
+        os.path.join(
+            PROJECT_DIR,
+            CORRECTED_DICT_LOCAL_PATH
+            )
+        )
+    )
 # Set the path to the GloVe model from environment variables
-_GLOVE_PATH = os.path.join(os.getenv("RESOURCES_PATH"), os.getenv("GLOVE_PATH"))
-GLOVE_PATH = os.path.join(PROJECT_DIR, _GLOVE_PATH)
+GLOVE_LOCAL_PATH = os.path.join(
+    os.getenv("RESOURCES_PATH"),
+    os.getenv("GLOVE_PATH")
+)
+GLOVE_PATH = os.path.join(PROJECT_DIR, GLOVE_LOCAL_PATH)
 
 
 def load_glove_model() -> List[Any]:
     """
-    Loads the GloVe model from a local file if available, otherwise downloads it
+    Loads the GloVe model from a local file if available,
+    otherwise downloads it
 
     Returns:
-        Either a dictionary with words as keys and their embeddings as values or a KeyedVectors object
+        Either a dictionary with words as keys and their embeddings as values
+        or a KeyedVectors object
     """
 
     try:
         print(f"Trying to load GloVe model from {GLOVE_PATH}")
-        glove_model = KeyedVectors.load_word2vec_format(GLOVE_PATH, binary=False)
+        glove_model = KeyedVectors.load_word2vec_format(
+            GLOVE_PATH, binary=False
+        )
     except Exception:
         print("GloVe model not found locally, downloading it...")
         glove_model = downloader.load("glove-wiki-gigaword-300")
@@ -149,9 +166,15 @@ def lazy_teacher_pipeline(text: Union[str, List[str]],
 
     text = [simple_cleaning(text) for text in text]
     tokenized_texts = [word_tokenize(text) for text in text]
-    words_not_in_glove = [vocabulary_coverage(tokenized_text, glove_vocab) for tokenized_text in tokenized_texts]
+    words_not_in_glove = [
+        vocabulary_coverage(tokenized_text, glove_vocab)
+        for tokenized_text in tokenized_texts
+    ]
     if on_the_fly:
-        corrected_words = [correct_text_on_the_fly(word_not_in_glove, glove_vocab) for word_not_in_glove in words_not_in_glove]
+        corrected_words = [
+            correct_text_on_the_fly(word_not_in_glove, glove_vocab)
+            for word_not_in_glove in words_not_in_glove
+        ]
         corrected_texts = [
             [corrected_words[i].get(word, word) for word in tokenized_text]
             for i, tokenized_text in enumerate(tokenized_texts)
@@ -170,7 +193,12 @@ def lazy_teacher_pipeline(text: Union[str, List[str]],
     text = [" ".join(cleaned_text) for cleaned_text in corrected_texts]
 
     model.to(device)
-    inputs = tokenizer(text, padding=True, truncation=True, return_tensors="pt").to(device)
+    inputs = tokenizer(
+        text,
+        padding=True,
+        truncation=True,
+        return_tensors="pt"
+    ).to(device)
     model.eval()
     with torch.inference_mode():
         logits = model(**inputs).logits
