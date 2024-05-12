@@ -1,4 +1,5 @@
 # Imports for environment variables
+import platform
 import io
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
@@ -16,9 +17,10 @@ from dotenv import load_dotenv
 from utils import lazy_teacher_pipeline, load_glove_model
 
 # for windows users
-pytesseract.pytesseract.tesseract_cmd = (
-    'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
-)
+if platform.system() == 'Windows':
+    pytesseract.pytesseract.tesseract_cmd = (
+        'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+    )
 
 # Load environment variables
 ENV_FILE_PATH = (
