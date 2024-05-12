@@ -39,8 +39,7 @@ app = FastAPI()
 # Set up CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins=[f"http://{host}:{app_port}"],
-    allow_origins=["http://127.0.0.1:5500"],
+    allow_origins=[f"http://{host}:{app_port}"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
@@ -65,7 +64,17 @@ async def index():
             "Hello, please go to /docs to see the API documentation"}
 
 
-@app.post("/upload/")
+@app.get("/model")
+async def get_model():
+    return {"model": model_ckpt}
+
+
+@app.get("/device")
+async def get_device():
+    return {"device": device}
+
+
+@app.post("/upload")
 async def create_upload_file(image: UploadFile = File(...)):
     image_data = await image.read()
     image_pil = Image.open(io.BytesIO(image_data))
@@ -77,7 +86,6 @@ async def create_upload_file(image: UploadFile = File(...)):
                                  device=device)
     return JSONResponse(content={"text": text,
                                  "note": note[0]})
-    return {"message": "Fichier reçu"}
 
 
 if __name__ == "__main__":

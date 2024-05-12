@@ -1,0 +1,12 @@
+torch==2.2.2
+transformers==4.40.1
+python-dotenv==0.21.0
+nltk==3.8.1
+gensim==4.3.2
+Levenshtein==0.25.1
+uvicorn==0.29.0
+fastapi==0.111.0
+platformdirs==4.1.0
+pytesseract==0.3.10
+Pillow==9.2.0
+

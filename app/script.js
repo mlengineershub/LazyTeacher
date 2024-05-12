@@ -6,12 +6,10 @@ document.getElementById('uploadBtn').addEventListener('click', function () {
         const formData = new FormData();
         formData.append('image', file);
 
-        // Reset and show progress bar
         const progressBar = document.getElementById('progressBar');
         progressBar.style.width = '0%';
         document.getElementById('progressBarContainer').style.display = 'block';
 
-        // Simulate progress
         let progress = 0;
         const interval = setInterval(() => {
             if (progress < 100) {
@@ -22,7 +20,7 @@ document.getElementById('uploadBtn').addEventListener('click', function () {
             }
         }, 100);
 
-        fetch('http://127.0.0.1:8000/upload/', {
+        fetch('http://127.0.0.1:8000/upload', {
             method: 'POST',
             body: formData,
         })
