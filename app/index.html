@@ -24,7 +24,14 @@
             <p>Upload your copy</p>
         </div>
         <button id="uploadBtn">Upload Image</button>
+        <div id="progressBarContainer" style="width: 80%; margin-top: 20px;">
+            <div id="progressBar" style="height: 20px; background-color: #4a148c; width: 0%;"></div>
+        </div>
+        <div id="gradeOutput" style="display: none; margin-top: 20px; font-size: 18px;">
+            The grade is: <span id="grade"></span>
+        </div>
         <div id="results"></div>
+        <button id="refreshBtn">Refresh</button>
     </main>
     <footer>
         <div class="footer-content">
