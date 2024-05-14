@@ -43,7 +43,8 @@ class TextMultiClassificationEvaluator(TextClassificationEvaluator):
 
     def compute_metric(
         self,
-        metric: List[Tuple[EvaluationModule, Dict[str, Any]]],
+        metric: Union[List[Tuple[EvaluationModule, Dict[str, Any]]],
+                      EvaluationModule],
         metric_inputs: Dict,
         strategy: Literal["simple", "bootstrap"] = "simple",
         confidence_level: float = 0.95,
@@ -65,8 +66,10 @@ class TextMultiClassificationEvaluator(TextClassificationEvaluator):
                                                n_resamples,
                                                random_state,
                                                kwarg)
-                result.update({f"{m}_{k}_{v}": result_m.values()
-                              for k, v in kwarg.items()})
+                _values_str = "_".join([str(v) for v in kwarg.values()])
+                result.update({f"{m.name}_{_values_str}":
+                               list(result_m.values())})
+            return result
 
         result = metric.compute(
             **metric_inputs,
@@ -117,27 +120,25 @@ class TextMultiClassificationEvaluator(TextClassificationEvaluator):
                     "Please specify a valid `metric` argument."
                 )
             metric = load(self.default_metric_name)
-        elif isinstance(metric, str):
+        elif isinstance(metric, str) or isinstance(metric, EvaluationModule):
+            em = load(metric) if isinstance(metric, str) else metric
             if metrics_kwargs and metric in metrics_kwargs:
                 if isinstance(metrics_kwargs[metric], dict):
-                    return [(load(metric), metrics_kwargs[metric])]
+                    return [(em, metrics_kwargs[metric])]
                 elif isinstance(metrics_kwargs[metric], list):
-                    return [(load(metric), m) for m in metrics_kwargs[metric]]
-            return [(load(metric), {})]
-        elif isinstance(metric, EvaluationModule):
-            return [(metric, {})]
-        elif isinstance(metric, list):
+                    return [(em, m_) for m_ in metrics_kwargs[metric]]
+            return [(em, {})]
+        else:
             metric_ = []
             for m in metric:
-                if isinstance(m, str):
-                    m = load(m)
+                em = load(m) if isinstance(m, str) else m
                 if metrics_kwargs and m in metrics_kwargs:
                     if isinstance(metrics_kwargs[m], dict):
-                        metric_.append((m, metrics_kwargs[m]))
+                        metric_.append((em, metrics_kwargs[m]))
                     elif isinstance(metrics_kwargs[m], list):
-                        metric_.extend([(m, m_)
+                        metric_.extend([(em, m_)
                                         for m_ in metrics_kwargs[m]])
-                if not metrics_kwargs or m not in metrics_kwargs:
+                else:
                     metric_.append((m, {}))
 
             return metric_
@@ -202,7 +203,7 @@ class TextMultiClassificationEvaluator(TextClassificationEvaluator):
             feature_extractor=feature_extractor,
             device=device,
         )
-        metric = self.prepare_metric(metric)
+        metric = self.prepare_metric(metric, metrics_kwargs)
         # Compute predictions
         predictions, perf_results = self.call_pipeline(pipe, pipe_inputs)
         predictions = self.predictions_processor(predictions, label_mapping)
@@ -214,8 +215,7 @@ class TextMultiClassificationEvaluator(TextClassificationEvaluator):
             strategy=strategy,
             confidence_level=confidence_level,
             n_resamples=n_resamples,
-            random_state=random_state,
-            metrics_kwargs=metrics_kwargs
+            random_state=random_state
         )
         result.update(metric_results)
         result.update(perf_results)
