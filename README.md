@@ -26,8 +26,8 @@ The repository is organized into several key areas:
 To get started with this project, clone the repository and install the required dependencies:
 
 ```bash
-git clone [repository-link]
-cd [repository-folder]
+git clone https://github.com/mlengineershub/LazyTeacher
+cd LazyTeacher
 pip install -r requirements.txt
 ```
 
