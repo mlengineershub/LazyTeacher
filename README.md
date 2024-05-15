@@ -35,9 +35,13 @@ Refer to individual READMEs in each directory for more detailed instructions on 
 
 ## Global Architecture
 
-![Global Architecture](./path_to_image_in_repo)
+![Global Architecture](./rsrc/process.png)
 
 This diagram illustrates the comprehensive workflow of our project, from data handling and model training to deployment and user interaction.
+
+Here is a look of our front end application :
+![Front](./rsrc/front.png)
+
 
 ## How to Use
 
