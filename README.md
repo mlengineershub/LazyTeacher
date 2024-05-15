@@ -43,11 +43,11 @@ This diagram illustrates the comprehensive workflow of our project, from data ha
 
 Navigate through the project using the following links to understand and interact with the different components:
 
-- [ML Folder](link-to-ml-folder)
-  - [Preprocessing Folder](link-to-preprocessing-folder)
-  - [Training Folder](link-to-training-folder)
-- [Endpoints](link-to-endpoints)
-- [App Interface](link-to-app)
+- [ML Folder](https://github.com/mlengineershub/LazyTeacher/tree/main/ml)
+  - [Preprocessing Folder](https://github.com/mlengineershub/LazyTeacher/tree/main/ml/preprocessing)
+  - [Training Folder](https://github.com/mlengineershub/LazyTeacher/tree/main/ml/training)
+- [Endpoints](https://github.com/mlengineershub/LazyTeacher/tree/main/endpoints)
+- [App Interface](https://github.com/mlengineershub/LazyTeacher/tree/main/app)
 
 ## Contributing
 
