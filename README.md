@@ -16,6 +16,7 @@ The repository is organized into several key areas:
 1. **ML Folder:** Focuses on machine learning model development.
    - `preprocessing/`: Data preprocessing techniques, including exploratory data analysis and sampling methods.
    - `training/`: Model training scripts, exploring different machine learning algorithms and transformer models.
+   - `error_analysis/`: Banchmark and error analysis of the most relevant model.
 
 2. **Endpoints:** Contains FastAPI code for model deployment, allowing real-time essay grading.
 
