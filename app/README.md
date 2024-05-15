@@ -62,9 +62,9 @@ python endpoint.py
 
 ## Contributing
 
-If you have suggestions for additional features or improvemen, please feel free to contribute. Detailed instructions on how to contribute can be found in the main project README.
+If you have suggestions for additional features or improvement, please feel free to contribute. Detailed instructions on how to contribute can be found in the main project README.
 
 ## Contact
 
-For questions or additional information about the application, refer to the main project README or reach out directly to the contributors via their GitHub profiles.
+For questions or additional information about the application, refer to the main project README or reach us out directly.
 
