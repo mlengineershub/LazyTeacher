@@ -24,7 +24,7 @@ The application is designed to provide an intuitive interface for users to inter
 1. Ensure you have all necessary dependencies installed:
 ```bash
 cd LazyTeacher
-pip install -r requierement.txt
+pip install -r requierements.txt
 ```
 
 2. Please, make sure to install and setup correctly **Pytesseract**
