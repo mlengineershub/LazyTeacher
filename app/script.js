@@ -31,8 +31,8 @@ document.getElementById('uploadBtn').addEventListener('click', function () {
                 console.log('Success:', data);
                 document.getElementById('grade').innerText = data.note;
                 document.getElementById('gradeOutput').style.display = 'block';
-                document.getElementById('results').innerText = data.text;
-                document.getElementById('results').style.display = 'block';
+                // document.getElementById('results').innerText = data.text;
+                // document.getElementById('results').style.display = 'block';
                 document.getElementById('progressBarContainer').style.display = 'none';
                 window.scrollTo(0, 0);
             })
@@ -43,7 +43,7 @@ document.getElementById('uploadBtn').addEventListener('click', function () {
                 alert('Upload failed.');
                 document.getElementById('progressBarContainer').style.display = 'none';
                 document.getElementById('gradeOutput').style.display = 'none';
-                document.getElementById('results').style.display = 'none';
+                // document.getElementById('results').style.display = 'none';
             });
     } else {
         alert('Please select a file to upload.');
