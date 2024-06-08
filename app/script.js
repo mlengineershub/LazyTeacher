@@ -20,7 +20,7 @@ document.getElementById('uploadBtn').addEventListener('click', function () {
             }
         }, 100);
 
-        fetch('http://127.0.0.1:8000/upload', {
+        fetch('/api/upload', {
             method: 'POST',
             body: formData,
         })
